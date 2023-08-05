@@ -54,11 +54,11 @@ export function MemberMenu({ member, isAdmin, onRename, onRemove, onDeleteParty,
 						<Input 
 							value={rename} 
 							onChangeText={setRename} 
-							onEndEditing={() => onRename(member, rename)}
+							onEndEditing={() => onRename(member, rename.trim())}
 						/>
 						{isAdmin
-							? <Button onPress={() => onDeleteParty()}><Text>Delete Party</Text></Button>
-							: <Button onPress={() => onRemove(member)}><Text>Remove</Text></Button>
+							? <Button onPress={() => onDeleteParty()}>Delete Party</Button>
+							: <Button onPress={() => onRemove(member)}>Remove</Button>
 						}
 					</Div>
 				</TouchableWithoutFeedback>

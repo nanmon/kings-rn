@@ -11,7 +11,6 @@ export const theme = StyleSheet.create({
 		fontFamily: 'Monocraft',
 	},
 	input: {
-		// backgroundColor: colors.background,
 		color: colors.foreground,
 		borderBottomWidth: StyleSheet.hairlineWidth,
 		borderBottomColor: colors.foreground,
@@ -22,10 +21,16 @@ export const theme = StyleSheet.create({
 		color: colors.foreground,
 		borderColor: colors.foreground,
 		borderWidth: 1,
-		// borderRadius: 20,
 		padding: 8,
 		height: 40,
 		width: '100%',
 		alignItems: 'center'
 	},
+	button__disabled: {
+		borderColor: colors.foreground + '99',
+	},
+	button_text__disabled: {
+		color: colors.foreground + '99',
+		textDecorationLine: 'line-through'
+	}
 })

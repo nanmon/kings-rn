@@ -2,8 +2,7 @@ import { useState } from "react";
 import { StyleSheet } from "react-native";
 import * as FileSystem from 'expo-file-system'
 import * as Sharing from 'expo-sharing'
-import { IParty } from "../fsdb/IParty";
-import { addMember, removeMember, renameMember, shuffle } from "../fsdb/fsdb";
+import { PartyService, IParty } from "../services/party.service";
 import { MemberMenu } from "./MemberMenu";
 import { Input } from "./Input";
 import { MemberItem } from "./MemberItem";
@@ -38,19 +37,20 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 	const [memberOptions, setMemberOptions] = useState<string | undefined>(undefined)
 
 	const handleAddPerson = () => {
-		if (!newPersonInput) return
-		const updatedParty = addMember(party, newPersonInput)
+		if (!newPersonInput.trim()) return
+		const updatedParty = PartyService.addMember(party, newPersonInput.trim())
 		onPartyChange(updatedParty)
 		setNewPersonInput('')
 	}
 
 	const handleRename = (member: string, newName: string) => {
-		onPartyChange(renameMember(party, member, newName))
+		if (!newName) return
+		onPartyChange(PartyService.renameMember(party, member, newName))
 		setMemberOptions(newName)
 	}
 
 	const handleDelete = (member: string) => {
-		onPartyChange(removeMember(party, member))
+		onPartyChange(PartyService.removeMember(party, member))
 		setMemberOptions(undefined)
 	}
 
@@ -59,7 +59,7 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 	}
 
 	const handleShuffle = () => {
-		onPartyChange(shuffle(party))
+		onPartyChange(PartyService.shuffle(party))
 	}
 
 	const handleMemberClick = async (person: string) => {
@@ -90,11 +90,17 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 					<MemberItem key={person} member={person} onPress={handleMemberClick}/>
 				))}
 			</Div>
-			{party.giftChain == null &&
-				<Button style={styles.shuffle} disabled={party.people.length <3} onPress={handleShuffle}>
-					<Text>Shuffle</Text>
+			{party.giftChain == null 
+			? <Button 
+					style={styles.shuffle} 
+					disabled={party.people.length <3} 
+					onPress={handleShuffle}
+				>
+					Shuffle
 				</Button>
-			}
+			: <Button style={styles.shuffle} onPress={handleDeleteParty}>
+					Delete Party
+				</Button>}
 			<MemberMenu 
 				member={memberOptions} 
 				isAdmin={party.people[0] === memberOptions} 
