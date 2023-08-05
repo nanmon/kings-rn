@@ -1,10 +1,15 @@
 import { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { StyleSheet } from "react-native";
 import * as FileSystem from 'expo-file-system'
 import * as Sharing from 'expo-sharing'
 import { IParty } from "../fsdb/IParty";
-import { addMember, removeMember, shuffle } from "../fsdb/fsdb";
-import { MemberMenu, MemberMenuProps } from "./MemberMenu";
+import { addMember, removeMember, renameMember, shuffle } from "../fsdb/fsdb";
+import { MemberMenu } from "./MemberMenu";
+import { Input } from "./Input";
+import { MemberItem } from "./MemberItem";
+import { Div } from "./Div";
+import { Button } from "./Button";
+import { Text } from "./Text";
 
 interface PartySetupProps {
 	party: IParty
@@ -14,10 +19,18 @@ interface PartySetupProps {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
+	addMemberInput: {
+		width: 232,
+	},
+	list: {
+		marginVertical: 24,
+	},
+	shuffle: {
+		width: 200
+	},
 });
 
 export function PartySetup({ party, onPartyChange }: PartySetupProps) {
@@ -31,17 +44,18 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 		setNewPersonInput('')
 	}
 
-	const handleMenuAction: MemberMenuProps["onAction"] = (action, member) => {
-		if (action === 'rename') {
-			
-		}
-		if (action === 'remove') {
-			onPartyChange(removeMember(party, member))
-		}
-		if (action === 'deleteParty') {
-			onPartyChange(null)
-		}
+	const handleRename = (member: string, newName: string) => {
+		onPartyChange(renameMember(party, member, newName))
+		setMemberOptions(newName)
+	}
+
+	const handleDelete = (member: string) => {
+		onPartyChange(removeMember(party, member))
 		setMemberOptions(undefined)
+	}
+
+	const handleDeleteParty = () => {
+		onPartyChange(null)
 	}
 
 	const handleShuffle = () => {
@@ -61,29 +75,34 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 	}
 
 	return (
-		<View style={styles.container}>
+		<Div style={styles.container}>
 			{party.giftChain == null &&
-				<TextInput 
+				<Input
+					style={styles.addMemberInput}
 					placeholder="Write new member name" 
 					value={newPersonInput} 
 					onChangeText={setNewPersonInput} 
 					onEndEditing={handleAddPerson}
 				/>
 			}
-			{party.people.map((person) => (
-				<TouchableOpacity key={person} onPress={() => handleMemberClick(person)}>
-					<Text>{person}</Text>
-				</TouchableOpacity>
-			))}
+			<Div style={styles.list}>
+				{party.people.map((person) => (
+					<MemberItem key={person} member={person} onPress={handleMemberClick}/>
+				))}
+			</Div>
 			{party.giftChain == null &&
-				<Button title="Shuffle" disabled={party.people.length <3} onPress={handleShuffle}/>
+				<Button style={styles.shuffle} disabled={party.people.length <3} onPress={handleShuffle}>
+					<Text>Shuffle</Text>
+				</Button>
 			}
 			<MemberMenu 
 				member={memberOptions} 
 				isAdmin={party.people[0] === memberOptions} 
-				onAction={handleMenuAction} 
+				onRename={handleRename} 
+				onRemove={handleDelete} 
+				onDeleteParty={handleDeleteParty} 
 				onClose={() => setMemberOptions(undefined)}
 			/>
-		</View>
+		</Div>
 	)
 }

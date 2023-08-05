@@ -1,9 +1,18 @@
-import { Button, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { useState } from "react";
+import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
+import { useSyncEffect } from "../hooks/useSyncEffect";
+import { Input } from "./Input";
+import { Div } from "./Div";
+import { colors } from "../theme/colors";
+import { Button } from "./Button";
+import { Text } from "./Text";
 
 export interface MemberMenuProps {
 	member?: string
 	isAdmin: boolean
-	onAction: (action: 'rename' | 'remove' | 'deleteParty', member: string, newName?: string) => void
+	onRename: (member: string, newName: string) => void
+	onRemove: (member: string) => void
+	onDeleteParty: () => void
 	onClose: () => void
 }
 
@@ -15,33 +24,43 @@ const styles = StyleSheet.create({
 		right: 0,
 		bottom: 0,
 		alignSelf: 'stretch',
-		backgroundColor: '#0009',
+		backgroundColor: '#000d',
 		justifyContent: 'center',
 		alignItems: 'center'
 	},
 	content: {
 		width: 200,
-		height: 300,
-		backgroundColor: 'white',
 		padding: 8,
-		gap: 8,
+		gap: 64,
+		// borderWidth: 1,
+		// borderColor: colors.foreground,
+		borderRadius: 8,
 	}
 })
 
-export function MemberMenu({ member, isAdmin, onAction, onClose }: MemberMenuProps) {
+export function MemberMenu({ member, isAdmin, onRename, onRemove, onDeleteParty, onClose }: MemberMenuProps) {
+	const [rename, setRename] = useState('')
+
+	useSyncEffect(() => {
+		if (member) setRename(member)
+	}, [member])
+
 	if (!member) return null
 	return (
 		<TouchableWithoutFeedback onPress={onClose}>
 			<View style={styles.backdrop}>
 				<TouchableWithoutFeedback>
-					<View style={styles.content}>
-						<Text>{member}</Text>
-						<Button title="Rename" onPress={() => onAction('rename', member)}/>
+					<Div style={styles.content}>
+						<Input 
+							value={rename} 
+							onChangeText={setRename} 
+							onEndEditing={() => onRename(member, rename)}
+						/>
 						{isAdmin
-							? <Button title="Delete Party" onPress={() => onAction('deleteParty', member)}/>
-							: <Button title="Remove" onPress={() => onAction('remove', member)}/>
+							? <Button onPress={() => onDeleteParty()}><Text>Delete Party</Text></Button>
+							: <Button onPress={() => onRemove(member)}><Text>Remove</Text></Button>
 						}
-					</View>
+					</Div>
 				</TouchableWithoutFeedback>
 			</View>
 		</TouchableWithoutFeedback>

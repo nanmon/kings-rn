@@ -43,7 +43,7 @@ export function renameMember(party: IParty, oldName: string, newName: string) {
 	const memberIndex = party.people.indexOf(oldName)
 	if (memberIndex === -1) return party
 	updatedParty.people.splice(memberIndex, 1, newName)
-	saveParty(party).catch(console.log)
+	saveParty(updatedParty).catch(console.log)
 	return updatedParty
 }
 

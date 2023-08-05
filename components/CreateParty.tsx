@@ -1,5 +1,9 @@
 import { useState } from "react"
-import { Button, StyleSheet, TextInput, View } from "react-native"
+import { StyleSheet } from "react-native"
+import { Div } from "./Div";
+import { Input } from "./Input";
+import { Button } from "./Button";
+import { Text } from "./Text";
 
 export interface CreatePartyProps {
 	onDone: (name: string) => void
@@ -8,10 +12,16 @@ export interface CreatePartyProps {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+		gap: 8,
   },
+	input: {
+		width: 230,
+	},
+	button: {
+		width: 230,
+	}
 });
 
 
@@ -21,9 +31,11 @@ export function CreateParty({ onDone }: CreatePartyProps) {
 	const handleCreate = () => onDone(name)
 
 	return (
-		<View style={styles.container}>
-			<TextInput value={name} onChangeText={setName}/>
-			<Button title="Create" onPress={handleCreate}/>
-		</View>
+		<Div style={styles.container}>
+			<Input style={styles.input} placeholder="Enter your name" value={name} onChangeText={setName}/>
+			<Button style={styles.button} onPress={handleCreate}>
+				<Text>Create Party</Text>
+			</Button>
+		</Div>
 	)
 }
