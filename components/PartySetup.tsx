@@ -1,6 +1,5 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet } from "react-native";
-import * as FileSystem from 'expo-file-system'
 import * as Sharing from 'expo-sharing'
 import { PartyService, IParty } from "../services/party.service";
 import { MemberMenu } from "./MemberMenu";
@@ -8,7 +7,8 @@ import { Input } from "./Input";
 import { MemberItem } from "./MemberItem";
 import { Div } from "./Div";
 import { Button } from "./Button";
-import { Text } from "./Text";
+import { DebugGiftee } from "./DebugGiftee";
+import { createTempGiftFile } from "../fsdb/fsdb";
 
 interface PartySetupProps {
 	party: IParty
@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+		gap: 8
   },
 	addMemberInput: {
 		width: 232,
@@ -66,10 +67,8 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 		if (party.giftChain == null) {
 			setMemberOptions(person)
 		} else {
-			const giftIndex = party.giftChain.indexOf(person)
-			const giftTo = party.giftChain[(giftIndex + 1) % party.giftChain.length]
-			const tmpUri = FileSystem.cacheDirectory + person + '.txt'
-			await FileSystem.writeAsStringAsync(tmpUri, giftTo)
+			const giftTo = PartyService.getGiftee(party, person)!
+			const tmpUri = await createTempGiftFile(person, giftTo)
 			Sharing.shareAsync(tmpUri)
 		}
 	}
@@ -87,20 +86,24 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 			}
 			<Div style={styles.list}>
 				{party.people.map((person) => (
-					<MemberItem key={person} member={person} onPress={handleMemberClick}/>
+					<React.Fragment key={person}>
+						<MemberItem member={person} onPress={handleMemberClick}/>
+						<DebugGiftee member={person} party={party}/>
+					</React.Fragment>
 				))}
 			</Div>
-			{party.giftChain == null 
-			? <Button 
-					style={styles.shuffle} 
-					disabled={party.people.length <3} 
-					onPress={handleShuffle}
-				>
-					Shuffle
-				</Button>
-			: <Button style={styles.shuffle} onPress={handleDeleteParty}>
+			<Button 
+				style={styles.shuffle} 
+				disabled={party.people.length <3} 
+				onPress={handleShuffle}
+			>
+				Shuffle
+			</Button>
+			{party.giftChain != null && 
+				<Button style={styles.shuffle} onPress={handleDeleteParty}>
 					Delete Party
-				</Button>}
+				</Button>
+			}
 			<MemberMenu 
 				member={memberOptions} 
 				isAdmin={party.people[0] === memberOptions} 

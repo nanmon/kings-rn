@@ -58,4 +58,11 @@ export class PartyService {
 		}
 		return updatedParty
 	}
+
+	static getGiftee(party: IParty, member: string): string | undefined {
+		const { giftChain } = party
+		if (!giftChain) return undefined
+		const memberIndex = giftChain.indexOf(member)
+		return giftChain[(memberIndex + 1) % giftChain.length]
+	}
 }

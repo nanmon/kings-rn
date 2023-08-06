@@ -3,9 +3,7 @@ import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { useSyncEffect } from "../hooks/useSyncEffect";
 import { Input } from "./Input";
 import { Div } from "./Div";
-import { colors } from "../theme/colors";
 import { Button } from "./Button";
-import { Text } from "./Text";
 
 export interface MemberMenuProps {
 	member?: string

@@ -3,7 +3,6 @@ import { StyleSheet } from "react-native"
 import { Div } from "./Div";
 import { Input } from "./Input";
 import { Button } from "./Button";
-import { Text } from "./Text";
 import { IParty, PartyService } from "../services/party.service";
 
 export interface CreatePartyProps {
