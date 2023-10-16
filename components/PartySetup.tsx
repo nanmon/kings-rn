@@ -50,6 +50,10 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 		setMemberOptions(newName)
 	}
 
+	const handleRestriction = (member1: string, member2: string) => {
+		onPartyChange(PartyService.toggleRestriction(party, member1, member2))
+	}
+
 	const handleDelete = (member: string) => {
 		onPartyChange(PartyService.removeMember(party, member))
 		setMemberOptions(undefined)
@@ -64,13 +68,21 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 	}
 
 	const handleMemberClick = async (person: string) => {
-		if (party.giftChain == null) {
-			setMemberOptions(person)
-		} else {
-			const giftTo = PartyService.getGiftee(party, person)!
-			const tmpUri = await createTempGiftFile(person, giftTo)
-			Sharing.shareAsync(tmpUri)
-		}
+		setMemberOptions(person)
+
+	}
+
+	const handleDownloadPick = async (member: string) => {
+		const giftTo = PartyService.getGiftee(party, member)!
+		const tmpUri = await createTempGiftFile(member, giftTo)
+		Sharing.shareAsync(tmpUri)
+	}
+
+	const handleUndoShuffle = () => {
+		onPartyChange({
+			...party,
+			giftChain: undefined
+		})
 	}
 
 	return (
@@ -92,24 +104,26 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 					</React.Fragment>
 				))}
 			</Div>
-			<Button 
-				style={styles.shuffle} 
-				disabled={party.people.length <3} 
-				onPress={handleShuffle}
-			>
-				Shuffle
-			</Button>
-			{party.giftChain != null && 
-				<Button style={styles.shuffle} onPress={handleDeleteParty}>
-					Delete Party
+			{party.giftChain == null 
+				? <Button 
+					style={styles.shuffle} 
+					disabled={party.people.length <3} 
+					onPress={handleShuffle}
+				>
+					Shuffle
+				</Button>
+				: <Button style={styles.shuffle} onPress={handleUndoShuffle}>
+					Undo Shuffle
 				</Button>
 			}
 			<MemberMenu 
 				member={memberOptions} 
-				isAdmin={party.people[0] === memberOptions} 
-				onRename={handleRename} 
+				party={party} 
+				onRename={handleRename}
+				onRestriction={handleRestriction}
 				onRemove={handleDelete} 
 				onDeleteParty={handleDeleteParty} 
+				onGetPick={handleDownloadPick}
 				onClose={() => setMemberOptions(undefined)}
 			/>
 		</Div>
