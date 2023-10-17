@@ -64,23 +64,33 @@ export class PartyService {
 			return PartyService.removeRestriction(party, member1, member2)
 		return PartyService.addRestriction(party, member1, member2)
 	}
+
+	static pick(party: IParty, member: string, available: string[]) {
+		const unrestricted = available.filter(person => !PartyService.hasRestriction(party, member, person))
+		if (unrestricted.length === 0) return null
+		const index = Math.floor(Math.random() * unrestricted.length)
+		return unrestricted[index]
+	}
 	
-	static shuffle(party: IParty) {
-		const rest = [...party.people]
-		const giftChain = rest.splice(0, 1)
+	static shuffle(party: IParty): IParty {
+		let rest = [...party.people]
+		let giftChain = rest.splice(0, 1)
 		while(rest.length > 0) {
-			const index = Math.floor(Math.random() * rest.length)
-			const [next] = rest.splice(index, 1)
-			// restriction check
 			const prev = giftChain.at(-1)!
-			const restricted = PartyService.hasRestriction(party, prev, next)
-			console.log({ prev, next, restricted })
-			if (!restricted) {
-				giftChain.push(next)
-			} else {
-				// unselect
-				rest.push(next)
+			const next = PartyService.pick(party, prev, rest)
+			if (!next) {
+				// cannot complete gift chain, reset
+				rest = [...party.people]
+				giftChain = rest.splice(0, 1)
+				continue
 			}
+			giftChain.push(next)
+			const index = rest.indexOf(next)
+			rest.splice(index, 1)
+		}
+		if (PartyService.hasRestriction(party, giftChain.at(-1)!, giftChain[0])) {
+			// first and last are restricted, try shuffle again
+			return PartyService.shuffle(party)
 		}
 		const updatedParty = {
 			...party,
