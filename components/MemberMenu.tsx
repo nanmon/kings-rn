@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { useSyncEffect } from "../hooks/useSyncEffect";
 import { Input } from "./Input";
 import { Div } from "./Div";
 import { Button } from "./Button";
 import { IParty, PartyService } from "../services/party.service";
-import { Text } from "./Text";
 import { MemberItem } from "./MemberItem";
+import { DeletePartyButton } from "./DeletePartyButton";
 
 export interface MemberMenuProps {
 	member?: string
@@ -35,8 +35,6 @@ const styles = StyleSheet.create({
 		width: 256,
 		padding: 24,
 		gap: 16,
-		// borderWidth: 1,
-		// borderColor: colors.foreground,
 		borderRadius: 8,
 	},
 	restricted: {
@@ -79,7 +77,7 @@ export function MemberMenu({ member, party, onRename, onRestriction, onRemove, o
 							))}
 						</Div>
 						{!isPartyStarted && !isAdmin && <Button onPress={() => onRemove(member)}>Remove</Button>}
-						{!isPartyStarted && isAdmin && <Button disabled={party.people.length > 0} onPress={() => onDeleteParty()}>Delete Party</Button>}
+						{!isPartyStarted && isAdmin && <DeletePartyButton onDelete={onDeleteParty}/> }
 						{isPartyStarted && <Button onPress={() => onGetPick(member)}>Get Pick</Button>}
 					</Div>
 				</TouchableWithoutFeedback>
