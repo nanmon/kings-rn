@@ -32,9 +32,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	content: {
-		width: 200,
-		padding: 8,
-		gap: 64,
+		width: 256,
+		padding: 24,
+		gap: 16,
 		// borderWidth: 1,
 		// borderColor: colors.foreground,
 		borderRadius: 8,
@@ -62,6 +62,8 @@ export function MemberMenu({ member, party, onRename, onRestriction, onRemove, o
 					<Div style={styles.content}>
 						<Input
 							value={rename}
+							// @ts-expect-error
+							readOnly={isPartyStarted}
 							onChangeText={setRename}
 							onEndEditing={() => onRename(member, rename.trim())}
 						/>
@@ -70,7 +72,8 @@ export function MemberMenu({ member, party, onRename, onRestriction, onRemove, o
 									<MemberItem
 										key={person}
 										member={person} 
-										restricted={PartyService.hasRestriction(party, member, person)} 
+										restricted={PartyService.hasRestriction(party, member, person)}
+										picked={PartyService.getGiftee(party, member) === person}
 										onPress={() => onRestriction(member, person)}
 									/>
 							))}

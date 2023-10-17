@@ -4,6 +4,7 @@ import { Text } from "./Text"
 interface MemberItemProps {
 	member: string
 	restricted?: boolean
+	picked?: boolean
 	onPress: (member: string) => void
 }
 
@@ -18,10 +19,11 @@ const styles = StyleSheet.create({
 	}
 })
 
-export function MemberItem({ member, restricted = false, onPress }: MemberItemProps) {
+export function MemberItem({ member, restricted = false, picked = false, onPress }: MemberItemProps) {
+	const isDev = process.env.NODE_ENV === 'development'
 	return (
 		<TouchableOpacity style={styles.memberItem} onPress={() => onPress(member)}>
-			<Text style={restricted && styles.restricted}>{member}</Text>
+			<Text style={restricted && styles.restricted}>{picked && isDev && '-> '}{member}</Text>
 		</TouchableOpacity>
 	)
 }

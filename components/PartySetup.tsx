@@ -51,6 +51,7 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 	}
 
 	const handleRestriction = (member1: string, member2: string) => {
+		if (party.giftChain != null) return
 		onPartyChange(PartyService.toggleRestriction(party, member1, member2))
 	}
 
@@ -98,10 +99,7 @@ export function PartySetup({ party, onPartyChange }: PartySetupProps) {
 			}
 			<Div style={styles.list}>
 				{party.people.map((person) => (
-					<React.Fragment key={person}>
-						<MemberItem member={person} onPress={handleMemberClick}/>
-						<DebugGiftee member={person} party={party}/>
-					</React.Fragment>
+					<MemberItem key={person} member={person} onPress={handleMemberClick}/>
 				))}
 			</Div>
 			{party.giftChain == null 
